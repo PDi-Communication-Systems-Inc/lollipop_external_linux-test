@@ -77,6 +77,7 @@ int g_frame_size;
 int g_frame_period = 33333;
 v4l2_std_id g_current_std = V4L2_STD_NTSC;
 
+int g_frame_count = 0x7FFFFFFF;
 struct testbuffer
 {
 	unsigned char *start;
@@ -483,7 +484,7 @@ mxc_v4l_tvin_test(void)
 	printf("start time = %d s, %d us\n", (unsigned int) tv_start.tv_sec,
 		(unsigned int) tv_start.tv_usec);
 
-	for (i = 0; ; i++) {
+	for (i = 0; i < g_frame_count; i++) {
 begin:
 		if (ioctl(fd_capture_v4l, VIDIOC_G_STD, &id)) {
 			printf("VIDIOC_G_STD failed.\n");
@@ -574,7 +575,7 @@ next:
 			}
 		}
 
-		memcpy(output_buffers[output_buf.index].start, capture_buffers[capture_buf.index].start, g_frame_size);
+		//memcpy(output_buffers[output_buf.index].start, capture_buffers[capture_buf.index].start, g_frame_size);
 		if (ioctl(fd_capture_v4l, VIDIOC_QBUF, &capture_buf) < 0) {
 			printf("VIDIOC_QBUF failed\n");
 			return TFAIL;
@@ -622,6 +623,9 @@ int process_cmdline(int argc, char **argv)
 		}
 		else if (strcmp(argv[i], "-ol") == 0) {
 			g_display_left = atoi(argv[++i]);
+		}
+		else if (strcmp(argv[i], "-c") == 0) {
+			g_frame_count = atoi(argv[++i]);
 		}
 		else if (strcmp(argv[i], "-r") == 0) {
 			g_rotate = atoi(argv[++i]);
@@ -677,6 +681,8 @@ int main(int argc, char **argv)
 	struct mxcfb_gbl_alpha alpha;
 	enum v4l2_buf_type type;
 
+	printf("+++ ATP ++++\n");
+	
 	if (process_cmdline(argc, argv) < 0) {
 		return TFAIL;
 	}
