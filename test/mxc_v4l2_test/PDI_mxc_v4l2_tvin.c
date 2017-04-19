@@ -209,7 +209,7 @@ int stop_capturing(void)
 static int prepare_display_buffers(void)
 {
 	int i;
-	int display_size = (1376*768*g_screen_info.bits_per_pixel / 8);
+	int display_size = (g_screen_info.xres_virtual * g_screen_info.yres * g_screen_info.bits_per_pixel / 8);
 
 	g_fb_display = (unsigned char *)mmap(0, display_size * g_display_num_buffers, 
 		PROT_READ | PROT_WRITE, MAP_SHARED, fd_fb_display, 0);
@@ -646,15 +646,15 @@ int mxc_v4l_tvin_test(void)
 	}
 
 	memset(&task, 0, sizeof(struct ipu_task));
-	task.output.width = 1376;//g_display_width;
+	task.output.width = g_display_width;
 	task.output.height = g_display_height;
-	task.output.crop.w = 1376; //g_display_width;
+	task.output.crop.w = g_display_width;
 	task.output.crop.h = g_display_height;
 	task.output.format = g_display_fmt;
 
 	task.input.width  = g_camera_width;
 	task.input.height = g_camera_height;
-	task.input.crop.w = g_camera_width;
+	task.input.crop.w = 1366;
 	task.input.crop.h = g_camera_height;
 
 	task.input.format = g_in_fmt;
